@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postora - Advanced Social Media Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/dragula@3.7.3/dist/dragula.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .post-editor {
+            min-height: 150px;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e0f2fe;
+        }
+        
+        .calendar-day.selected {
+            background-color: #0ea5e9;
+            color: white;
+        }
+        
+        .social-icon {
+            transition: all 0.2s ease;
+        }
+        
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            min-width: 160px;
+            z-index: 1;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Auth pages */
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+        }
+        
+        .auth-tab.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        /* Drag and drop */
+        .gu-mirror {
+            position: fixed !important;
+            margin: 0 !important;
+            z-index: 9999 !important;
+            opacity: 0.8;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+            filter: alpha(opacity=80);
+        }
+        
+        .gu-hide {
+            display: none !important;
+        }
+        
+        .gu-unselectable {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+        }
+        
+        .gu-transit {
+            opacity: 0.2;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+            filter: alpha(opacity=20);
+        }
+        
+        .draggable-post {
+            cursor: move;
+        }
+        
+        /* AI Research Panel */
+        .ai-research-panel {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        .ai-research-panel.open {
+            max-height: 500px;
+        }
+        
+        /* Video grid */
+        .video-thumbnail {
+            aspect-ratio: 9/16;
+        }
+        
+        /* Modal */
+        .modal {
+            transition: opacity 0.2s ease;
+        }
+        
+        .modal-content {
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 opacity-0 pointer-events-none">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Welcome to Postora</h2>
+                    <button id="closeAuthModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="auth-tabs mb-6">
+                    <div class="auth-tab active" data-tab="login">Login</div>
+                    <div class="auth-tab" data-tab="signup">Sign Up</div>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="loginForm" class="auth-form">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="login-email">Email</label>
+                        <input id="login-email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="login-password">Password</label>
+                        <input id="login-password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <input id="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <a href="#" id="forgot-password" class="text-sm text-blue-500 hover:text-blue-600">Forgot password?</a>
+                    </div>
+                    
+                    <button id="login-button" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md font-medium transition">
+                        Sign In
+                    </button>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-600">Or continue with</p>
+                        <div class="flex justify-center space-x-4 mt-2">
+                            <button class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center">
+                                <i class="fab fa-google"></i>
+                            </button>
+                            <button class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center">
+                                <i class="fab fa-apple"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sign Up Form -->
+                <div id="signupForm" class="auth-form hidden">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="signup-name">Full Name</label>
+                        <input id="signup-name" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="signup-email">Email</label>
+                        <input id="signup-email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="signup-password">Password</label>
+                        <input id="signup-password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="signup-confirm-password">Confirm Password</label>
+                        <input id="signup-confirm-password" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    
+                    <div class="flex items-center mb-6">
+                        <input id="terms-checkbox" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="terms-checkbox" class="ml-2 block text-sm text-gray-700">
+                            I agree to the <a href="#" class="text-blue-500 hover:text-blue-600">Terms & Conditions</a> and <a href="#" class="text-blue-500 hover:text-blue-600">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button id="signup-button" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md font-medium transition">
+                        Create Account
+                    </button>
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-600">Or sign up with</p>
+                        <div class="flex justify-center space-x-4 mt-2">
+                            <button class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center">
+                                <i class="fab fa-google"></i>
+                            </button>
+                            <button class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center">
+                                <i class="fab fa-apple"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Forgot Password Form -->
+                <div id="forgotPasswordForm" class="auth-form hidden">
+                    <div class="mb-6">
+                        <p class="text-gray-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="reset-email">Email</label>
+                        <input id="reset-email" type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="your@email.com">
+                    </div>
+                    
+                    <button id="send-reset-link" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md font-medium transition">
+                        Send Reset Link
+                    </button>
+                    
+                    <div class="mt-4 text-center">
+                        <button id="back-to-login" class="text-sm text-blue-500 hover:text-blue-600">Back to login</button>
+                    </div>
+                </div>
+                
+                <!-- 2FA Verification Form -->
+                <div id="verificationForm" class="auth-form hidden">
+                    <div class="mb-6">
+                        <p class="text-gray-600 mb-4">We've sent a verification code to your email/phone. Please enter it below.</p>
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="verification-code">Verification Code</label>
+                        <input id="verification-code" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter 6-digit code">
+                    </div>
+                    
+                    <button id="verify-button" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md font-medium transition">
+                        Verify Account
+                    </button>
+                    
+                    <div class="mt-4 text-center text-sm text-gray-600">
+                        <p>Didn't receive a code? <button id="resend-code" class="text-blue-500 hover:text-blue-600">Resend code</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar bg-white w-64 flex-shrink-0 border-r border-gray-200 flex flex-col h-full">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">P</div>
+                <h1 class="text-xl font-bold text-gray-800">Postora</h1>
+            </div>
+        </div>
+        
+        <div class="p-4">
+            <button id="newPostButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition">
+                <i class="fas fa-plus"></i>
+                <span>New Post</span>
+            </button>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto">
+            <div class="px-4 py-2">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Menu</h3>
+                <ul class="mt-2 space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg">
+                            <i class="fas fa-home text-blue-500"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Calendar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="exploreTab" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-compass"></i>
+                            <span>Explore</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="researchTab" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-search"></i>
+                            <span>Research & Script</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="px-4 py-2 mt-4 border-t border-gray-100">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Social Accounts</h3>
+                <ul class="mt-2 space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-instagram text-pink-500"></i>
+                            <span>Instagram</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-tiktok text-black"></i>
+                            <span>TikTok</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-facebook text-blue-600"></i>
+                            <span>Facebook</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-youtube text-red-600"></i>
+                            <span>YouTube</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-linkedin text-blue-700"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="px-4 py-2 mt-4 border-t border-gray-100">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Team</h3>
+                <ul class="mt-2 space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-users"></i>
+                            <span>Members</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Support</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center space-x-3">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full" alt="Profile">
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800">Sarah Johnson</p>
+                    <p class="text-xs text-gray-500">Admin</p>
+                </div>
+                <button class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Navigation -->
+        <header class="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-gray-700 md:hidden">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 id="pageTitle" class="text-xl font-semibold text-gray-800">Dashboard</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                
+                <button class="text-gray-500 hover:text-gray-700 relative">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                
+                <div class="flex items-center space-x-2">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-8 h-8 rounded-full" alt="Profile">
+                    <span class="hidden md:inline text-sm font-medium">Sarah Johnson</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <!-- Dashboard View -->
+            <div id="dashboardView" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Scheduled Posts</p>
+                                        <p class="text-2xl font-bold text-gray-800">24</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                        <i class="fas fa-calendar-check text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Engagement Rate</p>
+                                        <p class="text-2xl font-bold text-gray-800">4.8%</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-500">
+                                        <i class="fas fa-chart-line text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Team Members</p>
+                                        <p class="text-2xl font-bold text-gray-800">5</p>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
+                                        <i class="fas fa-users text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Post Composer -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="p-4 border-b border-gray-100">
+                                <h3 class="font-medium text-gray-800">Create New Post</h3>
+                            </div>
+                            
+                            <div class="p-4">
+                                <div class="flex space-x-2 mb-4">
+                                    <button class="social-icon w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center">
+                                        <i class="fab fa-instagram"></i>
+                                    </button>
+                                    <button class="social-icon w-10 h-10 rounded-full bg-black text-white flex items-center justify-center">
+                                        <i class="fab fa-tiktok"></i>
+                                    </button>
+                                    <button class="social-icon w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </button>
+                                    <button class="social-icon w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center">
+                                        <i class="fab fa-youtube"></i>
+                                    </button>
+                                    <button class="social-icon w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="post-editor p-4 mb-4 bg-white">
+                                    <textarea class="w-full focus:outline-none resize-none" placeholder="What would you like to post?" rows="4"></textarea>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <div class="flex space-x-2">
+                                            <button class="text-gray-500 hover:text-blue-500">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-blue-500">
+                                                <i class="fas fa-video"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-blue-500">
+                                                <i class="fas fa-link"></i>
+                                            </button>
+                                        </div>
+                                        <div class="text-sm text-gray-500">0/280</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Schedule</label>
+                                        <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                            <option>Publish Now</option>
+                                            <option>Schedule for Later</option>
+                                            <option>Add to Queue</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Date & Time</label>
+                                        <div class="relative">
+                                            <input type="datetime-local" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Schedule Post</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Posts -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                                <h3 class="font-medium text-gray-800">Recent Posts</h3>
+                                <button class="text-sm text-blue-500 hover:text-blue-600">View All</button>
+                            </div>
+                            
+                            <div class="divide-y divide-gray-100">
+                                <!-- Post 1 -->
+                                <div class="post-card p-4 hover:shadow-md transition cursor-pointer">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white">
+                                            <i class="fab fa-instagram"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-medium text-gray-800">Instagram Post</h4>
+                                                <div class="dropdown relative">
+                                                    <button class="text-gray-500 hover:text-gray-700">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </button>
+                                                    <div class="dropdown-content mt-2 bg-white shadow-lg rounded-md py-1 w-40">
+                                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reschedule</a>
+                                                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">Check out our new product line launching next week! #excited #newproducts</p>
+                                            <div class="flex items-center justify-between mt-3">
+                                                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span>Tomorrow, 10:00 AM</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                                    <span class="text-xs text-gray-500">Scheduled</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Post 2 -->
+                                <div class="post-card p-4 hover:shadow-md transition cursor-pointer">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">
+                                            <i class="fab fa-tiktok"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-medium text-gray-800">TikTok Video</h4>
+                                                <div class="dropdown relative">
+                                                    <button class="text-gray-500 hover:text-gray-700">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </button>
+                                                    <div class="dropdown-content mt-2 bg-white shadow-lg rounded-md py-1 w-40">
+                                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reschedule</a>
+                                                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">Behind the scenes at our latest product shoot - coming soon! #bts #comingsoon</p>
+                                            <div class="flex items-center justify-between mt-3">
+                                                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span>Jul 15, 2:30 PM</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1">
+                                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                    <span class="text-xs text-gray-500">Published</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Post 3 -->
+                                <div class="post-card p-4 hover:shadow-md transition cursor-pointer">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white">
+                                            <i class="fab fa-youtube"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <h4 class="font-medium text-gray-800">YouTube Video</h4>
+                                            <div class="dropdown relative">
+                                                <button class="text-gray-500 hover:text-gray-700">
+                                                    <i class="fas fa-ellipsis-h"></i>
+                                                </button>
+                                                <div class="dropdown-content mt-2 bg-white shadow-lg rounded-md py-1 w-40">
+                                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reschedule</a>
+                                                    <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-1">Our latest tutorial video is now live! Learn how to use our new features. #tutorial #howto</p>
+                                        <div class="flex items-center justify-between mt-3">
+                                            <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                <span>Jul 18, 9:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center space-x-1">
+                                                <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                                <span class="text-xs text-gray-500">Pending Approval</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <!-- Calendar -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100">
+                            <h3 class="font-medium text-gray-800">Calendar</h3>
+                        </div>
+                        
+                        <div class="p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <button class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <h4 class="font-medium text-gray-800">July 2023</h4>
+                                <button class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-gray-500 mb-2">
+                                <div>S</div>
+                                <div>M</div>
+                                <div>T</div>
+                                <div>W</div>
+                                <div>T</div>
+                                <div>F</div>
+                                <div>S</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-1">
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">26</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">27</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">28</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">29</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">30</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">1</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">2</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">3</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">4</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">5</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">6</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">7</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">8</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">9</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">10</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">11</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">12</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">13</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">14</div>
+                                <div class="calendar-day selected py-2 text-center text-sm cursor-pointer font-bold">15</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">16</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">17</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">18</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">19</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">20</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">21</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">22</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">23</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">24</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">25</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">26</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">27</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">28</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">29</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">30</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">31</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">1</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">2</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">3</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">4</div>
+                                <div class="calendar-day py-2 text-center text-sm cursor-pointer">5</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scheduled Posts -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="font-medium text-gray-800">Scheduled Posts</h3>
+                            <button class="text-sm text-blue-500 hover:text-blue-600">View All</button>
+                        </div>
+                        
+                        <div class="p-4 space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Today</span>
+                                    <span class="text-xs text-gray-500">2 posts</span>
+                                </div>
+                                <div class="progress-bar bg-gray-200 w-full">
+                                    <div class="progress-bar bg-green-500" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">This Week</span>
+                                    <span class="text-xs text-gray-500">8/12 posts</span>
+                                </div>
+                                <div class="progress-bar bg-gray-200 w-full">
+                                    <div class="progress-bar bg-blue-500" style="width: 66%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">This Month</span>
+                                    <span class="text-xs text-gray-500">18/30 posts</span>
+                                </div>
+                                <div class="progress-bar bg-gray-200 w-full">
+                                    <div class="progress-bar bg-yellow-500" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Activity -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100">
+                            <h3 class="font-medium text-gray-800">Team Activity</h3>
+                        </div>
+                        
+                        <div class="p-4 space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-8 h-8 rounded-full" alt="Team member">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Michael Chen</p>
+                                    <p class="text-xs text-gray-600">Scheduled a post on TikTok</p>
+                                    <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" class="w-8 h-8 rounded-full" alt="Team member">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Emily Rodriguez</p>
+                                    <p class="text-xs text-gray-600">Approved a pending Instagram post</p>
+                                    <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" class="w-8 h-8 rounded-full" alt="Team member">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">David Wilson</p>
+                                    <p class="text-xs text-gray-600">Created a new content library item</p>
+                                    <p class="text-xs text-gray-500 mt-1">Yesterday</p>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full text-sm text-blue-500 hover:text-blue-600 mt-2">
+                                View All Activity
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Explore View -->
+        <div id="exploreView" class="hidden space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Explore High-Performing Content</h2>
+                
+                <div class="mb-6">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="relative flex-1">
+                            <input type="text" placeholder="Search for topics, hashtags..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option>All Platforms</option>
+                            <option>Instagram</option>
+                            <option>TikTok</option>
+                            <option>YouTube</option>
+                            <option>Facebook</option>
+                        </select>
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option>All Categories</option>
+                            <option>Fashion</option>
+                            <option>Tech</option>
+                            <option>Food</option>
+                            <option>Travel</option>
+                            <option>Fitness</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">#trending</button>
+                        <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">#viral</button>
+                        <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">#explorepage</button>
+                        <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">#fyp</button>
+                        <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">#trendingnow</button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Video 1 -->
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                        <div class="relative video-thumbnail">
+                            <img src="https://images.unsplash.com/photo-1611162616475-46b635cb6868?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" class="w-full h-full object-cover" alt="Video thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                <button class="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-play text-gray-800"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                1.2M views
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 mb-1">How to make perfect coffee</h3>
+                                    <p class="text-xs text-gray-500">@coffeelover • 2 days ago</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-blue-500 add-to-project" data-video-id="1">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#coffee</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#barista</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#tutorial</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 2 -->
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                        <div class="relative video-thumbnail">
+                            <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" class="w-full h-full object-cover" alt="Video thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                <button class="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-play text-gray-800"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                2.7M views
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 mb-1">Morning routine 2023</h3>
+                                    <p class="text-xs text-gray-500">@productivityguru • 1 week ago</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-blue-500 add-to-project" data-video-id="2">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#morningroutine</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#productivity</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#selfcare</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 3 -->
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                        <div class="relative video-thumbnail">
+                            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" class="w-full h-full object-cover" alt="Video thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                <button class="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-play text-gray-800"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                3.1M views
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 mb-1">Easy home workout</h3>
+                                    <p class="text-xs text-gray-500">@fitnesstrainer • 3 days ago</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-blue-500 add-to-project" data-video-id="3">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#workout</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#fitness</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#homegym</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 4 -->
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                        <div class="relative video-thumbnail">
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1160&q=80" class="w-full h-full object-cover" alt="Video thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                <button class="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-play text-gray-800"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                4.5M views
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 mb-1">5 minute recipes</h3>
+                                    <p class="text-xs text-gray-500">@quickmeals • 5 days ago</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-blue-500 add-to-project" data-video-id="4">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#recipes</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#quickmeals</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#cooking</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 5 -->
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                        <div class="relative video-thumbnail">
+                            <img src="https://images.unsplash.com/photo-1521791055366-0d553872125f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" class="w-full h-full object-cover" alt="Video thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                <button class="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-play text-gray-800"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                1.8M views
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 mb-1">Travel hacks 2023</h3>
+                                    <p class="text-xs text-gray-500">@traveladdict • 2 weeks ago</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-blue-500 add-to-project" data-video-id="5">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#travel</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#hacks</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#tips</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 6 -->
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
+                        <div class="relative video-thumbnail">
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80" class="w-full h-full object-cover" alt="Video thumbnail">
+                            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                <button class="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-play text-gray-800"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                2.3M views
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-800 mb-1">Team building activities</h3>
+                                    <p class="text-xs text-gray-500">@workplacepro • 4 days ago</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-blue-500 add-to-project" data-video-id="6">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#teamwork</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#office</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#activities</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center mt-6">
+                    <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                        Load More
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Research & Script View -->
+        <div id="researchView" class="hidden space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Research & Script Generation</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Selected Videos -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h3 class="font-medium text-gray-800 mb-4">Selected Videos for Research</h3>
+                            
+                            <div id="selectedVideosContainer" class="space-y-3">
+                                <div class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-video text-3xl mb-2"></i>
+                                    <p>No videos selected yet</p>
+                                    <p class="text-sm mt-2">Select videos from the Explore page to begin research</p>
+                                </div>
+                            </div>
+                            
+                            <button id="analyzeButton" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition opacity-50 cursor-not-allowed" disabled>
+                                <i class="fas fa-magic"></i>
+                                <span>Generate Research & Script</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Research Results -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <h3 class="font-medium text-gray-800 mb-4">AI Research Results</h3>
+                            
+                            <div id="aiResearchPanel" class="ai-research-panel">
+                                <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                                    <h4 class="font-medium text-gray-800 mb-2">Content Analysis</h4>
+                                    <div class="prose max-w-none text-gray-700">
+                                        <p>The selected videos share several common characteristics that contribute to their high performance:</p>
+                                        <ul class="list-disc pl-5 mt-2">
+                                            <li>Engaging hooks in the first 3 seconds</li>
+                                            <li>Clear, concise messaging</li>
+                                            <li>High-quality visuals with good lighting</li>
+                                            <li>Authentic, relatable presentation style</li>
+                                            <li>Strong call-to-action in the closing</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                                    <h4 class="font-medium text-gray-800 mb-2">Recommended Script</h4>
+                                    <div class="prose max-w-none text-gray-700">
+                                        <p><strong>Hook (0-3s):</strong> "Want to know the secret to perfect coffee every time?"</p>
+                                        <p><strong>Introduction (3-8s):</strong> "I've tested dozens of methods and today I'm sharing the 3 easiest ways to make barista-quality coffee at home."</p>
+                                        <p><strong>Main Content (8-45s):</strong> Demonstrate each method with clear close-up shots. Keep explanations simple but informative. Use text overlays for key points.</p>
+                                        <p><strong>Closing (45-60s):</strong> "Which method will you try first? Let me know in the comments and don't forget to save this for your next coffee break!"</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                                    <h4 class="font-medium text-gray-800 mb-2">Caption & Hashtag Suggestions</h4>
+                                    <div class="prose max-w-none text-gray-700">
+                                        <p><strong>Caption:</strong> "Barista secrets revealed! ☕ These 3 methods will transform your morning coffee routine. Which one will you try first? #CoffeeLover #HomeBarista #PerfectBrew"</p>
+                                        <p><strong>Hashtags:</strong> #CoffeeTime #CoffeeAddict #BrewGuide #CoffeeTips #MorningRoutine #CaffeineFix #CoffeeGram #SpecialtyCoffee</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 flex space-x-3">
+                                    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg">
+                                        <i class="fas fa-save mr-2"></i> Save to Projects
+                                    </button>
+                                    <button class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg">
+                                        <i class="fas fa-redo mr-2"></i> Regenerate
+                                    </button>
+                                    <button class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg">
+                                        <i class="fas fa-edit mr-2"></i> Edit Script
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="emptyResearchState" class="text-center py-12 text-gray-500">
+                                <i class="fas fa-search text-3xl mb-2"></i>
+                                <p>No research generated yet</p>
+                                <p class="text-sm mt-2">Select videos and click "Generate Research & Script" to get AI-powered insights</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics View -->
+        <div id="analyticsView" class="hidden space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Analytics Dashboard</h2>
+                    <div class="flex space-x-3">
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>Last 90 Days</option>
+                            <option>Custom Range</option>
+                        </select>
+                        <button class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg">
+                            <i class="fas fa-download mr-2"></i> Export
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Total Posts</p>
+                                <p class="text-2xl font-bold text-gray-800">42</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                <i class="fas fa-calendar-check text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">Engagement Rate</p>
+                                <p class="text-2xl font-bold text-gray-800">5.2%</p>
+                                <p class="text-xs text-green-500 mt-1">↑ 1.2% from last period</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-500">
+                                <i class="fas fa-chart-line text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500">New Followers</p>
+                                <p class="text-2xl font-bold text-gray-800">1,284</p>
+                                <p class="text-xs text-green-500 mt-1">↑ 18% from last period</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-500">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-6">
+                    <h3 class="font-medium text-gray-800 mb-4">Engagement Over Time</h3>
+                    <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400">
+                        [Engagement Chart Placeholder]
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                        <h3 class="font-medium text-gray-800 mb-4">Top Performing Posts</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
+                                    <img src="https://images.unsplash.com/photo-1611162616475-46b635cb6868?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8
+
+
+</body>
+</html>
+

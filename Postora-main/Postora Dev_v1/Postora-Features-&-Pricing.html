@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Postora - Next-Gen Social Media Management</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:'#2B6BE6',
+secondary:'#FFB800',
+accent: '#FF4B4B',
+dark: '#1A1A1A',
+light: '#F8F9FA'
+},
+borderRadius:{
+'none':'0px',
+'sm':'4px',
+DEFAULT:'8px',
+'md':'12px',
+'lg':'16px',
+'xl':'20px',
+'2xl':'24px',
+'3xl':'32px',
+'full':'9999px',
+'button':'8px'
+},
+fontFamily: {
+'sans': ['Inter', 'sans-serif'],
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+}
+.gradient-text {
+background: linear-gradient(90deg, #2B6BE6, #FF4B4B);
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+}
+.hero-gradient {
+background: radial-gradient(circle at 70% 30%, rgba(255, 184, 0, 0.15) 0%, rgba(43, 107, 230, 0.1) 50%, rgba(255, 75, 75, 0.05) 100%);
+}
+.feature-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+.pricing-card:hover {
+transform: scale(1.02);
+}
+.platform-icon:hover {
+transform: translateY(-5px);
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 50px;
+height: 24px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+transition: .4s;
+border-radius: 34px;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 18px;
+width: 18px;
+left: 3px;
+bottom: 3px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .slider {
+background-color: #2B6BE6;
+}
+input:checked + .slider:before {
+transform: translateX(26px);
+}
+</style>
+</head>
+<body class="bg-white">
+<!-- Navigation -->
+<nav class="fixed top-0 left-0 right-0 bg-white z-50 shadow-sm">
+<div class="container mx-auto px-6 py-4 flex justify-between items-center">
+<div class="flex items-center">
+<img src="https://static.readdy.ai/image/7a21ac3edf1351834491f8fbe807ad23/27cc2b7c61ceb7dcd29661eb5565b9a0.png" alt="Postora Logo" class="h-12">
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<a href="#features" class="text-gray-700 hover:text-primary font-medium transition-colors">Features</a>
+<a href="#integrations" class="text-gray-700 hover:text-primary font-medium transition-colors">Integrations</a>
+<a href="#pricing" class="text-gray-700 hover:text-primary font-medium transition-colors">Pricing</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="text-primary font-medium hover:text-primary/80 transition-colors whitespace-nowrap !rounded-button">Login</button>
+<button class="bg-primary text-white px-5 py-2 font-medium hover:bg-primary/90 transition-colors whitespace-nowrap !rounded-button">Sign Up Free</button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="pt-32 pb-20 hero-gradient">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row items-center justify-between">
+<div class="md:w-1/2 mb-10 md:mb-0">
+<h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+Manage All Your <span class="gradient-text">Social Media</span> in One Place
+</h1>
+<p class="text-gray-600 text-lg mb-8 max-w-lg">
+Postora is the all-in-one social media management platform for creators and marketing agencies to plan, schedule, and analyze content across all platforms.
+</p>
+<div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+<a href="https://readdy.ai/home/cc3a5a68-99b2-42be-bc70-5e93e7cbe8bc/0451b193-0a03-454c-8535-ce25f91be273" data-readdy="true" class="inline-block">
+<button class="bg-primary text-white px-8 py-3 font-medium hover:bg-primary/90 transition-colors whitespace-nowrap !rounded-button">
+Start 7-Day Free Trial
+</button>
+</a>
+<button id="howItWorksBtn" class="border border-gray-300 px-8 py-3 font-medium hover:bg-gray-50 transition-colors whitespace-nowrap !rounded-button">
+See How It Works
+</button>
+<div id="demoModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+<div class="bg-white rounded-lg w-[90%] max-w-4xl relative">
+<button id="closeModal" class="absolute -right-3 -top-3 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
+<i class="ri-close-line text-gray-600"></i>
+</button>
+<div class="p-6">
+<h3 class="text-2xl font-bold mb-4">See Postora in Action</h3>
+<div class="aspect-video bg-gray-100 rounded-lg mb-6 overflow-hidden">
+<video id="demoVideo" class="w-full h-full object-cover" controls>
+<source src="https://your-video-url.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+<div class="mb-6">
+<h4 class="font-medium mb-2">Transform Your Social Media Management</h4>
+<p class="text-gray-600">Watch how Postora streamlines your social media workflow with AI-powered scheduling, content creation, and analytics - all in one platform.</p>
+</div>
+<div class="flex justify-end">
+<button class="bg-primary text-white px-6 py-2 font-medium hover:bg-primary/90 transition-colors whitespace-nowrap !rounded-button">Get Started Free</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p class="text-gray-500 mt-4 text-sm">No credit card required. Cancel anytime.</p>
+</div>
+<div class="md:w-1/2">
+<img src="https://readdy.ai/api/search-image?query=modern%20dashboard%20interface%20for%20social%20media%20management%20tool%20with%20calendar%20view%2C%20analytics%20charts%2C%20and%20content%20scheduling%20features.%20Clean%2C%20professional%20UI%20with%20blue%2C%20yellow%2C%20and%20red%20accent%20colors.%20High-quality%203D%20rendering%20with%20realistic%20screen%20display&width=600&height=500&seq=123456&orientation=landscape" alt="Postora Dashboard" class="rounded-lg shadow-xl w-full">
+</div>
+</div>
+</div>
+</section>
+<!-- Platform Integration Section -->
+<section id="integrations" class="py-20 bg-light">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-12">Connect with All Your Favorite Platforms</h2>
+<div class="flex flex-wrap justify-center items-center gap-8 md:gap-16">
+<div class="platform-icon flex flex-col items-center transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-white shadow-md rounded-full mb-3">
+<i class="ri-instagram-line ri-2x text-accent"></i>
+</div>
+<span class="font-medium">Instagram</span>
+</div>
+<div class="platform-icon flex flex-col items-center transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-white shadow-md rounded-full mb-3">
+<i class="ri-tiktok-line ri-2x text-dark"></i>
+</div>
+<span class="font-medium">TikTok</span>
+</div>
+<div class="platform-icon flex flex-col items-center transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-white shadow-md rounded-full mb-3">
+<i class="ri-facebook-circle-line ri-2x text-primary"></i>
+</div>
+<span class="font-medium">Facebook</span>
+</div>
+<div class="platform-icon flex flex-col items-center transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-white shadow-md rounded-full mb-3">
+<i class="ri-youtube-line ri-2x text-accent"></i>
+</div>
+<span class="font-medium">YouTube</span>
+</div>
+<div class="platform-icon flex flex-col items-center transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-white shadow-md rounded-full mb-3">
+<i class="ri-linkedin-box-line ri-2x text-primary"></i>
+</div>
+<span class="font-medium">LinkedIn</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section id="features" class="py-20">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-4">Powerful Features</h2>
+<p class="text-gray-600 text-center max-w-2xl mx-auto mb-16">Everything you need to manage your social media presence efficiently and effectively.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Feature 1 -->
+<div class="feature-card bg-white p-6 rounded-lg shadow-md transition-all duration-300">
+<div class="w-14 h-14 flex items-center justify-center bg-primary/10 rounded-lg mb-5">
+<i class="ri-calendar-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-semibold mb-3">Smart Scheduling</h3>
+<p class="text-gray-600 mb-4">Schedule posts across all platforms with our AI-powered optimal time suggestions.</p>
+<img src="https://readdy.ai/api/search-image?query=social%20media%20content%20calendar%20interface%20with%20scheduled%20posts%2C%20time%20slots%2C%20and%20color-coded%20categories.%20Clean%20modern%20UI%20design%20with%20blue%20accent%20colors&width=300&height=200&seq=123457&orientation=landscape" alt="Smart Scheduling" class="rounded-lg w-full h-40 object-cover object-top">
+</div>
+<!-- Feature 2 -->
+<div class="feature-card bg-white p-6 rounded-lg shadow-md transition-all duration-300">
+<div class="w-14 h-14 flex items-center justify-center bg-secondary/10 rounded-lg mb-5">
+<i class="ri-robot-line ri-2x text-secondary"></i>
+</div>
+<h3 class="text-xl font-semibold mb-3">AI Content Tools</h3>
+<p class="text-gray-600 mb-4">Generate natural-sounding captions and scripts with our advanced AI technology.</p>
+<img src="https://readdy.ai/api/search-image?query=AI%20content%20generation%20interface%20showing%20text%20editor%20with%20suggestions%20and%20auto-complete%20features.%20Modern%20UI%20with%20yellow%20accent%20colors%20and%20sample%20content%20being%20created&width=300&height=200&seq=123458&orientation=landscape" alt="AI Content Tools" class="rounded-lg w-full h-40 object-cover object-top">
+</div>
+<!-- Feature 3 -->
+<div class="feature-card bg-white p-6 rounded-lg shadow-md transition-all duration-300">
+<div class="w-14 h-14 flex items-center justify-center bg-accent/10 rounded-lg mb-5">
+<i class="ri-line-chart-line ri-2x text-accent"></i>
+</div>
+<h3 class="text-xl font-semibold mb-3">In-depth Analytics</h3>
+<p class="text-gray-600 mb-4">Track performance with detailed post-level analytics and customizable reports.</p>
+<img src="https://readdy.ai/api/search-image?query=social%20media%20analytics%20dashboard%20with%20charts%2C%20graphs%2C%20and%20engagement%20metrics.%20Professional%20data%20visualization%20with%20red%20accent%20colors%20and%20clean%20layout&width=300&height=200&seq=123459&orientation=landscape" alt="In-depth Analytics" class="rounded-lg w-full h-40 object-cover object-top">
+</div>
+<!-- Feature 4 -->
+<div class="feature-card bg-white p-6 rounded-lg shadow-md transition-all duration-300">
+<div class="w-14 h-14 flex items-center justify-center bg-primary/10 rounded-lg mb-5">
+<i class="ri-team-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-semibold mb-3">Team Collaboration</h3>
+<p class="text-gray-600 mb-4">Work seamlessly with your team using role-based access and approval workflows.</p>
+<img src="https://readdy.ai/api/search-image?query=team%20collaboration%20interface%20showing%20user%20roles%2C%20task%20assignments%2C%20and%20approval%20workflows.%20Modern%20UI%20with%20blue%20accent%20colors%20and%20multiple%20user%20avatars&width=300&height=200&seq=123460&orientation=landscape" alt="Team Collaboration" class="rounded-lg w-full h-40 object-cover object-top">
+</div>
+</div>
+</div>
+</section>
+<!-- Core Features Detail -->
+<section class="py-20 bg-light">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-16">Core Functionalities</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+<!-- Content Management -->
+<div class="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-primary/10 rounded-full mb-6 mx-auto">
+<i class="ri-file-list-3-line ri-2x text-primary"></i>
+</div>
+<h3 class="text-xl font-semibold text-center mb-4">Content Management</h3>
+<ul class="space-y-3">
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-primary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Drag-and-drop content calendar</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-primary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Bulk scheduling with smart presets</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-primary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Content library with asset management</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-primary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Post preview across all platforms</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-primary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Customizable content workflows</span>
+</li>
+</ul>
+</div>
+<!-- AI Automation -->
+<div class="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-secondary/10 rounded-full mb-6 mx-auto">
+<i class="ri-ai-generate-line ri-2x text-secondary"></i>
+</div>
+<h3 class="text-xl font-semibold text-center mb-4">AI Automation</h3>
+<ul class="space-y-3">
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-secondary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-secondary"></i>
+</div>
+<span class="text-gray-700">AI-powered caption generation</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-secondary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-secondary"></i>
+</div>
+<span class="text-gray-700">Natural script writing for videos</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-secondary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-secondary"></i>
+</div>
+<span class="text-gray-700">Hashtag research and optimization</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-secondary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-secondary"></i>
+</div>
+<span class="text-gray-700">Content ideas and trend suggestions</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-secondary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-secondary"></i>
+</div>
+<span class="text-gray-700">Smart content repurposing</span>
+</li>
+</ul>
+</div>
+<!-- Team Collaboration -->
+<div class="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 flex items-center justify-center bg-accent/10 rounded-full mb-6 mx-auto">
+<i class="ri-group-line ri-2x text-accent"></i>
+</div>
+<h3 class="text-xl font-semibold text-center mb-4">Team Collaboration</h3>
+<ul class="space-y-3">
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-accent/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-accent"></i>
+</div>
+<span class="text-gray-700">Role-based access control</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-accent/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-accent"></i>
+</div>
+<span class="text-gray-700">Content approval workflows</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-accent/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-accent"></i>
+</div>
+<span class="text-gray-700">Team activity tracking</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-accent/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-accent"></i>
+</div>
+<span class="text-gray-700">Shared content calendar</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center bg-accent/10 rounded-full mr-3 mt-0.5">
+<i class="ri-check-line text-accent"></i>
+</div>
+<span class="text-gray-700">Client access portal</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Dashboard Preview -->
+<section class="py-20">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row items-center justify-between">
+<div class="md:w-2/5 mb-10 md:mb-0">
+<h2 class="text-3xl font-bold mb-6">Feature-Rich Dashboard</h2>
+<p class="text-gray-600 mb-8">
+Our intuitive dashboard gives you complete control over your social media strategy with powerful tools and features.
+</p>
+<ul class="space-y-4">
+<li class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-calendar-check-line text-primary"></i>
+</div>
+<div>
+<h4 class="font-medium">Schedule & Calendar</h4>
+<p class="text-gray-600 text-sm">Plan and visualize your content strategy</p>
+</div>
+</li>
+<li class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-secondary/10 rounded-full mr-3 mt-0.5">
+<i class="ri-search-line text-secondary"></i>
+</div>
+<div>
+<h4 class="font-medium">Explore & Research</h4>
+<p class="text-gray-600 text-sm">Discover trending topics and content ideas</p>
+</div>
+</li>
+<li class="flex items-start">
+<div class="w-8 h-8 flex items-center justify-center bg-accent/10 rounded-full mr-3 mt-0.5">
+<i class="ri-bar-chart-box-line text-accent"></i>
+</div>
+<div>
+<h4 class="font-medium">Analytics & Reports</h4>
+<p class="text-gray-600 text-sm">Track performance and measure growth</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="md:w-3/5">
+<img src="https://readdy.ai/api/search-image?query=comprehensive%20social%20media%20management%20dashboard%20with%20calendar%20view%2C%20analytics%20section%2C%20and%20content%20creation%20tools.%20Professional%20UI%20with%20blue%2C%20yellow%2C%20and%20red%20accent%20colors%20on%20a%20clean%20white%20background.%20Modern%20and%20sleek%20interface%20design%20with%20multiple%20panels%20and%20data%20visualization&width=700&height=450&seq=123461&orientation=landscape" alt="Postora Dashboard" class="rounded-lg shadow-xl w-full">
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section id="pricing" class="py-20 bg-light">
+<div class="container mx-auto px-6">
+<h2 class="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
+<p class="text-gray-600 text-center max-w-2xl mx-auto mb-8">Choose the plan that works best for your needs.</p>
+<div class="flex justify-center items-center mb-12">
+<span class="mr-3 font-medium">Monthly</span>
+<label class="custom-switch">
+<input type="checkbox" id="billingToggle">
+<span class="slider"></span>
+</label>
+<span class="ml-3 font-medium">Annual <span class="text-sm text-primary">Save 20%</span></span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Starter Plan -->
+<div class="pricing-card bg-white p-8 rounded-lg shadow-md transition-all duration-300">
+<h3 class="text-xl font-semibold mb-2">Starter</h3>
+<p class="text-gray-600 mb-6">Perfect for individual creators</p>
+<div class="flex items-end mb-6">
+<span class="text-4xl font-bold" id="starterPrice">$29</span>
+<span class="text-gray-600 ml-1 mb-1">/month</span>
+</div>
+<ul class="space-y-3 mb-8">
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">5 social profiles</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">100 scheduled posts</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Basic analytics</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">AI content generation (50/mo)</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">1 user</span>
+</li>
+</ul>
+<button class="w-full bg-white border border-primary text-primary py-3 font-medium hover:bg-primary/5 transition-colors whitespace-nowrap !rounded-button">
+Start Free Trial
+</button>
+</div>
+<!-- Pro Plan -->
+<div class="pricing-card bg-white p-8 rounded-lg shadow-md transition-all duration-300 border-2 border-primary relative">
+<div class="absolute top-0 right-0 bg-primary text-white px-4 py-1 text-sm font-medium rounded-bl-lg rounded-tr-lg">
+Popular
+</div>
+<h3 class="text-xl font-semibold mb-2">Pro</h3>
+<p class="text-gray-600 mb-6">For growing businesses</p>
+<div class="flex items-end mb-6">
+<span class="text-4xl font-bold" id="proPrice">$79</span>
+<span class="text-gray-600 ml-1 mb-1">/month</span>
+</div>
+<ul class="space-y-3 mb-8">
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">15 social profiles</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Unlimited scheduled posts</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Advanced analytics & reports</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">AI content generation (200/mo)</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">3 users</span>
+</li>
+</ul>
+<button class="w-full bg-primary text-white py-3 font-medium hover:bg-primary/90 transition-colors whitespace-nowrap !rounded-button">
+Start Free Trial
+</button>
+</div>
+<!-- Agency Plan -->
+<div class="pricing-card bg-white p-8 rounded-lg shadow-md transition-all duration-300">
+<h3 class="text-xl font-semibold mb-2">Agency</h3>
+<p class="text-gray-600 mb-6">For marketing teams & agencies</p>
+<div class="flex items-end mb-6">
+<span class="text-4xl font-bold" id="agencyPrice">$199</span>
+<span class="text-gray-600 ml-1 mb-1">/month</span>
+</div>
+<ul class="space-y-3 mb-8">
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">50 social profiles</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Unlimited scheduled posts</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">Custom reports & white labeling</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">AI content generation (unlimited)</span>
+</li>
+<li class="flex items-start">
+<div class="w-6 h-6 flex items-center justify-center mr-3 mt-0.5">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span class="text-gray-700">10 users + client access</span>
+</li>
+</ul>
+<button class="w-full bg-white border border-primary text-primary py-3 font-medium hover:bg-primary/5 transition-colors whitespace-nowrap !rounded-button">
+Start Free Trial
+</button>
+</div>
+</div>
+<div class="mt-12 text-center">
+<p class="text-gray-600 mb-4">All plans include a 7-day free trial. No credit card required.</p>
+<div class="flex justify-center items-center space-x-6 mt-6">
+<div class="flex items-center">
+<i class="ri-secure-payment-line text-primary mr-2"></i>
+<span class="text-sm text-gray-600">Secure Payment</span>
+</div>
+<div class="flex items-center">
+<i class="ri-refund-2-line text-primary mr-2"></i>
+<span class="text-sm text-gray-600">Money-back Guarantee</span>
+</div>
+<div class="flex items-center">
+<i class="ri-customer-service-2-line text-primary mr-2"></i>
+<span class="text-sm text-gray-600">24/7 Support</span>
+</div>
+</div>
+<div class="flex justify-center mt-6 space-x-4">
+<i class="ri-visa-fill ri-2x text-gray-600"></i>
+<i class="ri-mastercard-fill ri-2x text-gray-600"></i>
+<i class="ri-paypal-fill ri-2x text-gray-600"></i>
+<i class="ri-apple-fill ri-2x text-gray-600"></i>
+</div>
+</div>
+</div>
+</section>
+<!-- Call-to-Action Footer -->
+<section class="py-20 bg-gradient-to-r from-primary/90 to-primary">
+<div class="container mx-auto px-6 text-center">
+<h2 class="text-3xl font-bold text-white mb-6">Ready to Transform Your Social Media Strategy?</h2>
+<p class="text-white/80 max-w-2xl mx-auto mb-8">
+Join thousands of creators and marketing teams who are saving time and growing their audience with Postora.
+</p>
+<div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+<button class="bg-white text-primary px-8 py-3 font-medium hover:bg-white/90 transition-colors whitespace-nowrap !rounded-button">
+Start Your 7-Day Free Trial
+</button>
+<button class="border border-white text-white px-8 py-3 font-medium hover:bg-white/10 transition-colors whitespace-nowrap !rounded-button">
+Schedule a Demo
+</button>
+</div>
+<p class="text-white/70 text-sm">No credit card required. Cancel anytime.</p>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-dark py-12">
+<div class="container mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between mb-12">
+<div class="mb-8 md:mb-0">
+<div class="flex items-center mb-4">
+<img src="https://static.readdy.ai/image/7a21ac3edf1351834491f8fbe807ad23/27cc2b7c61ceb7dcd29661eb5565b9a0.png" alt="Postora Logo" class="h-10">
+</div>
+<p class="text-gray-400 max-w-xs">
+The all-in-one social media management platform for creators and marketing agencies.
+</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+<div>
+<h4 class="text-white font-medium mb-4">Product</h4>
+<ul class="space-y-2">
+<li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+<li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Updates</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-medium mb-4">Company</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">About</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Partners</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-medium mb-4">Resources</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Community</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Webinars</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">API Docs</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-medium mb-4">Legal</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Security</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition-colors">Cookies</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+<p class="text-gray-500 mb-4 md:mb-0">© 2025 Postora. All rights reserved.</p>
+<div class="flex space-x-4">
+<a href="#" class="text-gray-400 hover:text-white transition-colors">
+<i class="ri-twitter-x-line ri-lg"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white transition-colors">
+<i class="ri-facebook-circle-line ri-lg"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white transition-colors">
+<i class="ri-instagram-line ri-lg"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white transition-colors">
+<i class="ri-linkedin-box-line ri-lg"></i>
+</a>
+<a href="#" class="text-gray-400 hover:text-white transition-colors">
+<i class="ri-youtube-line ri-lg"></i>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const billingToggle = document.getElementById('billingToggle');
+const howItWorksBtn = document.getElementById('howItWorksBtn');
+const demoModal = document.getElementById('demoModal');
+const closeModal = document.getElementById('closeModal');
+const demoVideo = document.getElementById('demoVideo');
+howItWorksBtn.addEventListener('click', function() {
+demoModal.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+});
+closeModal.addEventListener('click', function() {
+demoModal.classList.add('hidden');
+document.body.style.overflow = 'auto';
+if (demoVideo) {
+demoVideo.pause();
+}
+});
+demoModal.addEventListener('click', function(e) {
+if (e.target === demoModal) {
+demoModal.classList.add('hidden');
+document.body.style.overflow = 'auto';
+if (demoVideo) {
+demoVideo.pause();
+}
+}
+});
+const starterPrice = document.getElementById('starterPrice');
+const proPrice = document.getElementById('proPrice');
+const agencyPrice = document.getElementById('agencyPrice');
+billingToggle.addEventListener('change', function() {
+if (this.checked) {
+// Annual pricing
+starterPrice.textContent = '$23';
+proPrice.textContent = '$63';
+agencyPrice.textContent = '$159';
+} else {
+// Monthly pricing
+starterPrice.textContent = '$29';
+proPrice.textContent = '$79';
+agencyPrice.textContent = '$199';
+}
+});
+});
+</script>
+</body>
+</html>
